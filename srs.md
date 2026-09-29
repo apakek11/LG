@@ -1,328 +1,256 @@
-2. SRS — Software Requirements Specification
+# SRS — Software Requirements Specification
 
-A. Pendahuluan
+## A. Pendahuluan
 
-1. Tujuan
+### 1. Tujuan
 
-Dokumen SRS ini menjelaskan kebutuhan perangkat lunak yang diperlukan dalam pengembangan Lokal Gem, termasuk kebutuhan fungsional, nonfungsional, pengguna sistem, serta kebutuhan data.
+Dokumen SRS ini menjelaskan kebutuhan perangkat lunak yang diperlukan dalam pengembangan **Lokal Gem**, termasuk kebutuhan fungsional, nonfungsional, pengguna sistem, serta kebutuhan data.
 
-2. Ruang Lingkup
+### 2. Ruang Lingkup
 
 Lokal Gem merupakan sistem berbasis web yang digunakan untuk membantu pengguna menemukan tempat nongkrong berdasarkan informasi seperti nama tempat, lokasi, kategori, suasana, fasilitas, harga, foto, dan ulasan.
 
 Sistem memiliki dua jenis pengguna utama:
 
-User/Pengguna
-
-Admin
-
-
+- User/Pengguna
+- Admin
 
 ---
 
-B. Kebutuhan Fungsional
+## B. Kebutuhan Fungsional
 
-FR-01 — Registrasi
+### FR-01 — Registrasi
 
 Sistem harus memungkinkan pengguna membuat akun dengan memasukkan informasi yang diperlukan seperti:
 
-Nama
-
-Username/email
-
-Password
-
+- Nama
+- Username/email
+- Password
 
 Sistem harus melakukan validasi terhadap data yang dimasukkan.
 
-FR-02 — Login
+### FR-02 — Login
 
 Sistem harus memungkinkan pengguna dan admin melakukan login menggunakan akun yang telah terdaftar.
 
 Sistem harus melakukan validasi username/email dan password.
 
-FR-03 — Menampilkan Daftar Tempat
+### FR-03 — Menampilkan Daftar Tempat
 
 Sistem harus dapat menampilkan daftar tempat nongkrong yang tersedia.
 
 Setiap tempat minimal menampilkan:
 
-Nama tempat
+- Nama tempat
+- Foto
+- Lokasi
+- Kategori
+- Harga
+- Rating
 
-Foto
-
-Lokasi
-
-Kategori
-
-Harga
-
-Rating
-
-
-FR-04 — Pencarian Tempat
+### FR-04 — Pencarian Tempat
 
 Pengguna dapat mencari tempat berdasarkan nama atau kata kunci tertentu.
 
-Contoh:
+**Contoh:** User mengetik "Cafe" → Sistem menampilkan tempat yang berkaitan dengan Cafe.
 
-User mengetik "Cafe" → Sistem menampilkan tempat yang berkaitan dengan Cafe.
-
-FR-05 — Filter Tempat
+### FR-05 — Filter Tempat
 
 Sistem harus menyediakan filter untuk membantu pengguna mempersempit hasil pencarian.
 
 Contoh filter:
 
-Lokasi
+- Lokasi
+- Kategori
+- Harga
+- Suasana
+- Rating
 
-Kategori
-
-Harga
-
-Suasana
-
-Rating
-
-
-FR-06 — Detail Tempat
+### FR-06 — Detail Tempat
 
 Sistem harus menyediakan halaman detail untuk setiap tempat.
 
 Informasi yang ditampilkan meliputi:
 
-Nama tempat
+- Nama tempat
+- Foto
+- Deskripsi
+- Alamat
+- Jam operasional
+- Harga
+- Fasilitas
+- Suasana
+- Rating/review
+- Lokasi
 
-Foto
-
-Deskripsi
-
-Alamat
-
-Jam operasional
-
-Harga
-
-Fasilitas
-
-Suasana
-
-Rating/review
-
-Lokasi
-
-
-FR-07 — Favorit
+### FR-07 — Favorit
 
 Pengguna yang telah login dapat menyimpan tempat ke dalam daftar favorit.
 
 Pengguna juga dapat menghapus tempat dari daftar favorit.
 
-FR-08 — Review dan Rating
+### FR-08 — Review dan Rating
 
 Pengguna dapat memberikan rating dan review terhadap tempat yang dikunjungi.
 
 Sistem harus menyimpan:
 
-Nama pengguna
+- Nama pengguna
+- Rating
+- Isi review
+- Waktu review
 
-Rating
-
-Isi review
-
-Waktu review
-
-
-FR-09 — Lokasi
+### FR-09 — Lokasi
 
 Sistem harus menampilkan lokasi tempat dan menyediakan informasi yang dapat membantu pengguna menemukan lokasi tersebut.
 
-FR-10 — Admin Dashboard
+### FR-10 — Admin Dashboard
 
 Admin memiliki halaman dashboard untuk mengelola data sistem.
 
 Admin dapat:
 
-Menambahkan tempat.
+- Menambahkan tempat.
+- Mengubah informasi tempat.
+- Menghapus tempat.
+- Melihat data pengguna.
+- Mengelola review.
 
-Mengubah informasi tempat.
-
-Menghapus tempat.
-
-Melihat data pengguna.
-
-Mengelola review.
-
-
-FR-11 — Kelola Data Tempat
+### FR-11 — Kelola Data Tempat
 
 Admin dapat memasukkan informasi:
 
-Nama tempat
+- Nama tempat
+- Deskripsi
+- Alamat
+- Kategori
+- Harga
+- Fasilitas
+- Suasana
+- Foto
+- Jam operasional
+- Koordinat/lokasi
 
-Deskripsi
-
-Alamat
-
-Kategori
-
-Harga
-
-Fasilitas
-
-Suasana
-
-Foto
-
-Jam operasional
-
-Koordinat/lokasi
-
-
-FR-12 — Validasi Data
+### FR-12 — Validasi Data
 
 Sistem harus melakukan validasi terhadap data yang dimasukkan pengguna maupun admin.
 
 Contohnya:
 
-Field wajib tidak boleh kosong.
-
-Email harus memiliki format yang valid.
-
-Password harus sesuai dengan akun.
-
-Rating harus berada pada rentang yang ditentukan.
-
-
+- Field wajib tidak boleh kosong.
+- Email harus memiliki format yang valid.
+- Password harus sesuai dengan akun.
+- Rating harus berada pada rentang yang ditentukan.
 
 ---
 
-C. Kebutuhan Non-Fungsional
+## C. Kebutuhan Non-Fungsional
 
-NFR-01 — Usability
+### NFR-01 — Usability
 
 Antarmuka Lokal Gem harus mudah digunakan dan dipahami oleh pengguna.
 
-NFR-02 — Performance
+### NFR-02 — Performance
 
 Sistem harus mampu menampilkan halaman dan data dengan waktu respons yang wajar pada koneksi internet normal.
 
-NFR-03 — Security
+### NFR-03 — Security
 
 Sistem harus menjaga keamanan akun pengguna.
 
 Password tidak boleh disimpan dalam database dalam bentuk teks biasa.
 
-NFR-04 — Compatibility
+### NFR-04 — Compatibility
 
 Website dapat digunakan pada:
 
-Google Chrome
+- Google Chrome
+- Microsoft Edge
+- Mozilla Firefox
+- Browser mobile
 
-Microsoft Edge
-
-Mozilla Firefox
-
-Browser mobile
-
-
-NFR-05 — Responsive
+### NFR-05 — Responsive
 
 Tampilan website harus dapat menyesuaikan ukuran layar:
 
-Desktop
+- Desktop
+- Laptop
+- Tablet
+- Smartphone
 
-Laptop
-
-Tablet
-
-Smartphone
-
-
-NFR-06 — Availability
+### NFR-06 — Availability
 
 Sistem harus dapat diakses selama server dalam kondisi aktif dan normal.
 
-NFR-07 — Maintainability
+### NFR-07 — Maintainability
 
 Struktur kode harus dibuat secara terorganisir sehingga sistem dapat dikembangkan dan diperbaiki di kemudian hari.
 
-
 ---
 
-D. Kebutuhan Data
+## D. Kebutuhan Data
 
 Database Lokal Gem minimal memiliki tabel berikut:
 
-1. users
+### 1. `users`
 
-Field	Fungsi
+| Field | Fungsi |
+|---|---|
+| `id_user` | ID pengguna |
+| `nama` | Nama pengguna |
+| `email` | Email pengguna |
+| `password` | Password |
+| `role` | User/Admin |
 
-id_user	ID pengguna
-nama	Nama pengguna
-email	Email pengguna
-password	Password
-role	User/Admin
+### 2. `tempat`
 
+| Field | Fungsi |
+|---|---|
+| `id_tempat` | ID tempat |
+| `nama_tempat` | Nama tempat |
+| `deskripsi` | Deskripsi tempat |
+| `alamat` | Alamat |
+| `kategori` | Kategori tempat |
+| `suasana` | Suasana tempat |
+| `harga` | Kisaran harga |
+| `fasilitas` | Fasilitas |
+| `jam_buka` | Jam buka |
+| `jam_tutup` | Jam tutup |
+| `foto` | Foto tempat |
+| `latitude` | Koordinat latitude |
+| `longitude` | Koordinat longitude |
 
-2. tempat
+### 3. `review`
 
-Field	Fungsi
+| Field | Fungsi |
+|---|---|
+| `id_review` | ID review |
+| `id_user` | Pengguna yang memberikan review |
+| `id_tempat` | Tempat yang direview |
+| `rating` | Nilai rating |
+| `komentar` | Isi review |
+| `tanggal` | Waktu review |
 
-id_tempat	ID tempat
-nama_tempat	Nama tempat
-deskripsi	Deskripsi tempat
-alamat	Alamat
-kategori	Kategori tempat
-suasana	Suasana tempat
-harga	Kisaran harga
-fasilitas	Fasilitas
-jam_buka	Jam buka
-jam_tutup	Jam tutup
-foto	Foto tempat
-latitude	Koordinat latitude
-longitude	Koordinat longitude
+### 4. `favorit`
 
-
-3. review
-
-Field	Fungsi
-
-id_review	ID review
-id_user	Pengguna yang memberikan review
-id_tempat	Tempat yang direview
-rating	Nilai rating
-komentar	Isi review
-tanggal	Waktu review
-
-
-4. favorit
-
-Field	Fungsi
-
-id_favorit	ID favorit
-id_user	Pengguna
-id_tempat	Tempat yang disimpan
-
-
+| Field | Fungsi |
+|---|---|
+| `id_favorit` | ID favorit |
+| `id_user` | Pengguna |
+| `id_tempat` | Tempat yang disimpan |
 
 ---
 
-E. Hak Akses Pengguna
+## E. Hak Akses Pengguna
 
-Fitur	User	Admin
-
-Melihat tempat	✓	✓
-Mencari tempat	✓	✓
-Filter tempat	✓	✓
-Melihat detail	✓	✓
-Favorit	✓	-
-Review	✓	-
-Mengelola tempat	-	✓
-Mengelola pengguna	-	✓
-Mengelola review	-	✓
-
-
-
----
-
+| Fitur | User | Admin |
+|---|:---:|:---:|
+| Melihat tempat | ✓ | ✓ |
+| Mencari tempat | ✓ | ✓ |
+| Filter tempat | ✓ | ✓ |
+| Melihat detail | ✓ | ✓ |
+| Favorit | ✓ | - |
+| Review | ✓ | - |
+| Mengelola tempat | - | ✓ |
+| Mengelola pengguna | - | ✓ |
+| Mengelola review | - | ✓ |
