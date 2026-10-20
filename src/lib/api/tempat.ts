@@ -32,6 +32,7 @@ function mapTempat(row: TempatRow): Tempat {
     suasana: row.suasana,
     hargaLabel: row.harga_label,
     foto: row.foto[0] ?? '',
+    galeri: row.foto,
     rating: Number(row.rating),
     jumlahReview: row.jumlah_review,
     fasilitas: row.fasilitas,

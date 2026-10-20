@@ -14,12 +14,14 @@ const NAV_LINKS = [
 export function Header() {
   const [query, setQuery] = useState('')
   const [menuTerbuka, setMenuTerbuka] = useState(false)
+  const [navMobileTerbuka, setNavMobileTerbuka] = useState(false)
   const navigate = useNavigate()
   const { favoritIds } = useFavorit()
   const { user, logout } = useAuth()
 
   function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter' && query.trim()) {
+      setNavMobileTerbuka(false)
       navigate(`/jelajahi?q=${encodeURIComponent(query.trim())}`)
     }
   }
@@ -59,7 +61,7 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-space-md">
+        <div className="flex items-center gap-space-sm sm:gap-space-md">
           <div className="hidden sm:flex items-center bg-surface-container-low px-4 py-2 rounded-xl border border-outline-variant/30 w-64">
             <Icon name="search" className="text-outline text-[18px] mr-2" />
             <input
@@ -73,6 +75,19 @@ export function Header() {
           </div>
           <button type="button" className="p-2 text-on-surface-variant hover:text-on-surface transition-colors">
             <Icon name="notifications" className="text-[20px]" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setNavMobileTerbuka((prev) => !prev)
+              setMenuTerbuka(false)
+            }}
+            aria-expanded={navMobileTerbuka}
+            aria-controls="nav-mobile"
+            aria-label={navMobileTerbuka ? 'Tutup menu' : 'Buka menu'}
+            className="md:hidden p-2 text-on-surface"
+          >
+            <Icon name={navMobileTerbuka ? 'close' : 'menu'} />
           </button>
 
           {user ? (
@@ -90,6 +105,16 @@ export function Header() {
                     <p className="text-label-lg font-bold text-on-surface truncate">{user.nama}</p>
                     <p className="text-body-sm text-on-surface-variant truncate">{user.email}</p>
                   </div>
+                  {user.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMenuTerbuka(false)}
+                      className="w-full text-left px-4 py-2 text-body-md text-on-surface hover:bg-surface-container-low flex items-center gap-space-sm"
+                    >
+                      <Icon name="space_dashboard" className="text-[18px]" />
+                      Dashboard Admin
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -112,6 +137,42 @@ export function Header() {
           )}
         </div>
       </div>
+
+      {navMobileTerbuka && (
+        <nav id="nav-mobile" className="md:hidden border-t border-outline-variant/20 bg-surface px-6 py-space-md flex flex-col gap-1">
+          <div className="sm:hidden flex items-center bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant/30 mb-space-sm">
+            <Icon name="search" className="text-outline text-[18px] mr-2" />
+            <input
+              className="bg-transparent text-body-md text-on-surface outline-none w-full placeholder:text-outline"
+              placeholder="Cari tempat nongkrong..."
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={handleSearchKeyDown}
+            />
+          </div>
+          {NAV_LINKS.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.path === '/'}
+              onClick={() => setNavMobileTerbuka(false)}
+              className={({ isActive }) =>
+                `flex items-center justify-between px-4 py-3 rounded-xl text-body-lg transition-colors ${
+                  isActive ? 'bg-surface-container-high text-on-surface font-bold' : 'text-on-surface-variant hover:bg-surface-container-low'
+                }`
+              }
+            >
+              {link.label}
+              {link.path === '/favorit' && favoritIds.size > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-secondary text-on-secondary text-label-md leading-5 text-center">
+                  {favoritIds.size}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      )}
     </header>
   )
 }

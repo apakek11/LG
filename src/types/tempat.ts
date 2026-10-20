@@ -14,6 +14,7 @@ export interface Tempat {
   suasana: string
   hargaLabel: string
   foto: string
+  galeri: string[]
   rating: number
   jumlahReview: number
   fasilitas: string[]
@@ -26,6 +27,7 @@ export interface Tempat {
 export interface Review {
   id: string
   idTempat: string
+  userId: string | null
   namaUser: string
   inisial: string
   tempatDikunjungi: string

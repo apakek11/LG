@@ -28,6 +28,7 @@ export function Jelajahi() {
   const [lokasi, setLokasi] = useState(searchParams.get('lokasi') ?? '')
   const [kategori, setKategori] = useState(searchParams.get('kategori') ?? SEMUA_KATEGORI)
   const [suasana, setSuasana] = useState(searchParams.get('suasana') ?? SEMUA_SUASANA)
+  const [ratingMin, setRatingMin] = useState(Number(searchParams.get('rating') ?? 0) || 0)
   const [urutan, setUrutan] = useState<Urutan>('rating')
 
   const kategoriOptions = useMemo(
@@ -41,17 +42,20 @@ export function Jelajahi() {
   )
 
   const hasilTersaring = useMemo(() => {
-    const hasil = filterTempat(semuaTempat, { q, lokasi, kategori, suasana })
+    const hasil = filterTempat(semuaTempat, { q, lokasi, kategori, suasana, ratingMin })
     return sortTempat(hasil, urutan, coords ?? undefined)
-  }, [semuaTempat, q, lokasi, kategori, suasana, urutan, coords])
+  }, [semuaTempat, q, lokasi, kategori, suasana, ratingMin, urutan, coords])
 
-  const adaFilterAktif = Boolean(q || lokasi || kategori !== SEMUA_KATEGORI || suasana !== SEMUA_SUASANA)
+  const adaFilterAktif = Boolean(
+    q || lokasi || kategori !== SEMUA_KATEGORI || suasana !== SEMUA_SUASANA || ratingMin > 0,
+  )
 
   function resetSemuaFilter() {
     setQ('')
     setLokasi('')
     setKategori(SEMUA_KATEGORI)
     setSuasana(SEMUA_SUASANA)
+    setRatingMin(0)
   }
 
   return (
@@ -74,6 +78,8 @@ export function Jelajahi() {
             suasana={suasana}
             onSuasanaChange={setSuasana}
             suasanaOptions={suasanaOptions}
+            ratingMin={ratingMin}
+            onRatingMinChange={setRatingMin}
             urutan={urutan}
             onUrutanChange={setUrutan}
           />

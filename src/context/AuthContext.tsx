@@ -3,8 +3,13 @@ import { supabase } from '../lib/supabaseClient'
 import { AuthContext, type AuthResult, type AuthUser } from './auth-context'
 
 async function muatProfil(userId: string, email: string): Promise<AuthUser> {
-  const { data } = await supabase.from('profiles').select('nama').eq('id', userId).maybeSingle()
-  return { id: userId, email, nama: data?.nama ?? email.split('@')[0] }
+  const { data } = await supabase.from('profiles').select('nama, role').eq('id', userId).maybeSingle()
+  return {
+    id: userId,
+    email,
+    nama: data?.nama ?? email.split('@')[0],
+    role: data?.role === 'admin' ? 'admin' : 'user',
+  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

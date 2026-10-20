@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string
   nama: string
   email: string
+  role: 'user' | 'admin'
 }
 
 export interface AuthResult {

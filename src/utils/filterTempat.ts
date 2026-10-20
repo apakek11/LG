@@ -8,6 +8,7 @@ export interface TempatFilter {
   lokasi: string
   kategori: string
   suasana: string
+  ratingMin: number
 }
 
 export const SEMUA_KATEGORI = 'Semua Kategori'
@@ -18,6 +19,7 @@ export function filterTempat(spots: Tempat[], filter: Partial<TempatFilter>): Te
   const lokasi = filter.lokasi?.trim().toLowerCase() ?? ''
   const kategori = filter.kategori && filter.kategori !== SEMUA_KATEGORI ? filter.kategori : ''
   const suasana = filter.suasana && filter.suasana !== SEMUA_SUASANA ? filter.suasana : ''
+  const ratingMin = filter.ratingMin ?? 0
 
   return spots.filter((tempat) => {
     const cocokKeyword =
@@ -31,7 +33,9 @@ export function filterTempat(spots: Tempat[], filter: Partial<TempatFilter>): Te
     const cocokKategori = !kategori || tempat.kategori === kategori
     const cocokSuasana = !suasana || tempat.suasana === suasana
 
-    return cocokKeyword && cocokLokasi && cocokKategori && cocokSuasana
+    const cocokRating = tempat.rating >= ratingMin
+
+    return cocokKeyword && cocokLokasi && cocokKategori && cocokSuasana && cocokRating
   })
 }
 

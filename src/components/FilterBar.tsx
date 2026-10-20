@@ -10,6 +10,8 @@ interface FilterBarProps {
   suasana: string
   onSuasanaChange: (value: string) => void
   suasanaOptions: string[]
+  ratingMin: number
+  onRatingMinChange: (value: number) => void
   urutan: Urutan
   onUrutanChange: (value: Urutan) => void
 }
@@ -23,6 +25,8 @@ export function FilterBar({
   suasana,
   onSuasanaChange,
   suasanaOptions,
+  ratingMin,
+  onRatingMinChange,
   urutan,
   onUrutanChange,
 }: FilterBarProps) {
@@ -62,6 +66,21 @@ export function FilterBar({
           {suasanaOptions.map((option) => (
             <option key={option}>{option}</option>
           ))}
+        </select>
+      </div>
+
+      <div className="flex items-center gap-space-sm px-4 py-3 bg-surface-container-low rounded-xl">
+        <Icon name="star" className="text-secondary" />
+        <select
+          className="bg-transparent text-body-md text-on-surface outline-none font-medium"
+          value={ratingMin}
+          onChange={(event) => onRatingMinChange(Number(event.target.value))}
+          aria-label="Rating minimal"
+        >
+          <option value={0}>Semua Rating</option>
+          <option value={4.5}>4.5 ke atas</option>
+          <option value={4}>4.0 ke atas</option>
+          <option value={3}>3.0 ke atas</option>
         </select>
       </div>
 

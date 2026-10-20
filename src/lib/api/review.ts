@@ -4,15 +4,19 @@ import type { Review } from '../../types/tempat'
 interface ReviewRow {
   id: string
   tempat_id: string
+  user_id: string | null
   nama_user: string
   rating: number
   komentar: string
 }
 
+const REVIEW_SELECT = 'id, tempat_id, user_id, nama_user, rating, komentar'
+
 function mapReview(row: ReviewRow, tempatDikunjungi = ''): Review {
   return {
     id: row.id,
     idTempat: row.tempat_id,
+    userId: row.user_id,
     namaUser: row.nama_user,
     inisial: row.nama_user.charAt(0).toUpperCase(),
     tempatDikunjungi,
@@ -24,7 +28,7 @@ function mapReview(row: ReviewRow, tempatDikunjungi = ''): Review {
 export async function fetchReviewsByTempat(tempatId: string): Promise<Review[]> {
   const { data, error } = await supabase
     .from('review')
-    .select('id, tempat_id, nama_user, rating, komentar')
+    .select(REVIEW_SELECT)
     .eq('tempat_id', tempatId)
     .order('created_at', { ascending: false })
 
@@ -35,7 +39,7 @@ export async function fetchReviewsByTempat(tempatId: string): Promise<Review[]> 
 export async function fetchUlasanTerbaru(limit = 3): Promise<Review[]> {
   const { data, error } = await supabase
     .from('review')
-    .select('id, tempat_id, nama_user, rating, komentar, tempat:tempat_id(nama_tempat)')
+    .select(`${REVIEW_SELECT}, tempat:tempat_id(nama_tempat)`)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -61,7 +65,20 @@ export async function insertReview(params: {
       rating: params.rating,
       komentar: params.komentar,
     })
-    .select('id, tempat_id, nama_user, rating, komentar')
+    .select(REVIEW_SELECT)
+    .single()
+
+  if (error?.code === '23505') throw new Error('Kamu sudah pernah mengulas tempat ini. Ubah ulasan lamamu saja.')
+  if (error) throw error
+  return mapReview(data as unknown as ReviewRow)
+}
+
+export async function updateReview(id: string, params: { rating: number; komentar: string }): Promise<Review> {
+  const { data, error } = await supabase
+    .from('review')
+    .update({ rating: params.rating, komentar: params.komentar })
+    .eq('id', id)
+    .select(REVIEW_SELECT)
     .single()
 
   if (error) throw error

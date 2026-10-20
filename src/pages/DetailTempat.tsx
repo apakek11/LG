@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Footer } from '../components/Footer'
 import { Header } from '../components/Header'
 import { Icon } from '../components/Icon'
+import { PetaLokasi } from '../components/PetaLokasi'
 import { SpotGrid } from '../components/SpotGrid'
 import { StarRatingInput } from '../components/StarRatingInput'
 import { useFavoritAction } from '../hooks/useFavoritAction'
@@ -10,7 +11,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useJarakTempat } from '../hooks/useJarakTempat'
 import { useTempatList } from '../hooks/useTempatList'
 import { fetchTempatById } from '../lib/api/tempat'
-import { fetchReviewsByTempat, insertReview } from '../lib/api/review'
+import { fetchReviewsByTempat, insertReview, updateReview } from '../lib/api/review'
 import type { Review, Tempat } from '../types/tempat'
 import { getFasilitasIcon } from '../utils/fasilitasIcon'
 
@@ -29,7 +30,10 @@ export function DetailTempat() {
   const [ratingBaru, setRatingBaru] = useState(5)
   const [komentarBaru, setKomentarBaru] = useState('')
   const [mengirimReview, setMengirimReview] = useState(false)
+  const [reviewError, setReviewError] = useState('')
+  const [modeEditReview, setModeEditReview] = useState(false)
   const [tautanTersalin, setTautanTersalin] = useState(false)
+  const [fotoAktif, setFotoAktif] = useState(0)
 
   const { favorit, toggle: toggleFavorit } = useFavoritAction(id ?? '')
   const { label: jarak, dariLokasiPengguna } = useJarakTempat(tempat)
@@ -41,6 +45,8 @@ export function DetailTempat() {
     async function muat() {
       setLoadingTempat(true)
       setNotFound(false)
+      setFotoAktif(0)
+      setModeEditReview(false)
       try {
         const data = await fetchTempatById(id as string)
         if (!aktif) return
@@ -119,25 +125,51 @@ export function DetailTempat() {
 
   const tautanMaps = `https://www.google.com/maps/search/?api=1&query=${tempat.latitude},${tempat.longitude}`
 
-  async function handleTambahReview(event: FormEvent) {
+  const reviewSaya = user ? reviews.find((review) => review.userId === user.id) : undefined
+
+  function mulaiEditReview() {
+    if (!reviewSaya) return
+    setRatingBaru(reviewSaya.rating)
+    setKomentarBaru(reviewSaya.komentar)
+    setReviewError('')
+    setModeEditReview(true)
+  }
+
+  function batalEditReview() {
+    setModeEditReview(false)
+    setKomentarBaru('')
+    setRatingBaru(5)
+    setReviewError('')
+  }
+
+  async function handleKirimReview(event: FormEvent) {
     event.preventDefault()
     if (!user || !komentarBaru.trim() || !tempat) return
 
     setMengirimReview(true)
+    setReviewError('')
     try {
-      const reviewBaru = await insertReview({
-        tempatId: tempat.id,
-        userId: user.id,
-        namaUser: user.nama,
-        rating: ratingBaru,
-        komentar: komentarBaru.trim(),
-      })
-      setReviews((prev) => [reviewBaru, ...prev])
+      if (reviewSaya) {
+        const reviewDiubah = await updateReview(reviewSaya.id, { rating: ratingBaru, komentar: komentarBaru.trim() })
+        setReviews((prev) => prev.map((review) => (review.id === reviewDiubah.id ? reviewDiubah : review)))
+      } else {
+        const reviewBaru = await insertReview({
+          tempatId: tempat.id,
+          userId: user.id,
+          namaUser: user.nama,
+          rating: ratingBaru,
+          komentar: komentarBaru.trim(),
+        })
+        setReviews((prev) => [reviewBaru, ...prev])
+      }
+      setModeEditReview(false)
       setKomentarBaru('')
       setRatingBaru(5)
 
       const tempatTerbaru = await fetchTempatById(tempat.id)
       if (tempatTerbaru) setTempat(tempatTerbaru)
+    } catch (err) {
+      setReviewError(`Ulasan gagal dikirim: ${(err as Error).message}`)
     } finally {
       setMengirimReview(false)
     }
@@ -158,7 +190,11 @@ export function DetailTempat() {
       <Header />
       <main className="w-full pt-20 bg-surface">
         <div className="relative h-[320px] md:h-[420px] w-full overflow-hidden">
-          <img src={tempat.foto} alt={tempat.namaTempat} className="w-full h-full object-cover" />
+          <img
+            src={tempat.galeri[fotoAktif] ?? tempat.foto}
+            alt={`Foto ${fotoAktif + 1} dari ${tempat.namaTempat}`}
+            className="w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
           <Link
@@ -214,6 +250,28 @@ export function DetailTempat() {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-space-xl grid grid-cols-1 lg:grid-cols-3 gap-space-xl">
           <div className="lg:col-span-2 flex flex-col gap-space-xl">
+            {tempat.galeri.length > 1 && (
+              <section>
+                <h2 className="text-headline-sm text-on-surface mb-space-sm">Foto ({tempat.galeri.length})</h2>
+                <div className="flex gap-space-sm overflow-x-auto pb-1">
+                  {tempat.galeri.map((url, index) => (
+                    <button
+                      key={url}
+                      type="button"
+                      onClick={() => setFotoAktif(index)}
+                      aria-label={`Tampilkan foto ${index + 1}`}
+                      aria-pressed={fotoAktif === index}
+                      className={`shrink-0 w-28 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
+                        fotoAktif === index ? 'border-secondary' : 'border-transparent opacity-80 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
             <section>
               <h2 className="text-headline-sm text-on-surface mb-space-sm">Tentang Tempat</h2>
               <p className="text-body-lg text-on-surface-variant">{tempat.deskripsi}</p>
@@ -236,6 +294,7 @@ export function DetailTempat() {
 
             <section>
               <h2 className="text-headline-sm text-on-surface mb-space-sm">Lokasi</h2>
+              <PetaLokasi latitude={tempat.latitude} longitude={tempat.longitude} judul={tempat.namaTempat} className="h-72 mb-space-sm" />
               <div className="bg-surface-container-low rounded-2xl p-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
                 <div className="flex items-start gap-space-sm">
                   <Icon name="location_on" className="text-secondary text-[22px]" />
@@ -268,13 +327,30 @@ export function DetailTempat() {
                 </div>
               </div>
 
-              {user ? (
+              {user && reviewSaya && !modeEditReview ? (
+                <div className="bg-surface-container-low rounded-2xl p-space-lg flex items-center justify-between gap-space-md mb-space-lg flex-wrap">
+                  <span className="text-body-md text-on-surface-variant">
+                    Kamu sudah memberi {reviewSaya.rating} bintang untuk tempat ini.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={mulaiEditReview}
+                    className="flex items-center gap-1 border border-outline-variant/40 text-on-surface hover:bg-surface-container px-5 py-2.5 rounded-xl text-label-md font-medium transition-colors"
+                  >
+                    <Icon name="edit" className="text-[16px]" />
+                    Ubah Ulasan
+                  </button>
+                </div>
+              ) : user ? (
                 <form
-                  onSubmit={handleTambahReview}
+                  onSubmit={handleKirimReview}
                   className="bg-surface-container-low rounded-2xl p-space-lg flex flex-col gap-space-sm mb-space-lg"
                 >
-                  <span className="text-label-lg font-medium text-on-surface">Beri rating & ulasanmu</span>
+                  <span className="text-label-lg font-medium text-on-surface">
+                    {reviewSaya ? 'Ubah rating & ulasanmu' : 'Beri rating & ulasanmu'}
+                  </span>
                   <StarRatingInput value={ratingBaru} onChange={setRatingBaru} />
+                  {reviewError && <span className="text-body-sm text-error">{reviewError}</span>}
                   <textarea
                     value={komentarBaru}
                     onChange={(event) => setKomentarBaru(event.target.value)}
@@ -282,13 +358,25 @@ export function DetailTempat() {
                     rows={3}
                     className="bg-surface text-body-md text-on-surface outline-none placeholder:text-outline w-full rounded-xl px-4 py-3 border border-outline-variant/30"
                   />
-                  <button
-                    type="submit"
-                    disabled={!komentarBaru.trim() || mengirimReview}
-                    className="self-end bg-secondary hover:bg-secondary-container disabled:opacity-50 disabled:cursor-not-allowed text-on-secondary px-5 py-2.5 rounded-xl text-label-md font-medium transition-colors"
-                  >
-                    {mengirimReview ? 'Mengirim...' : 'Kirim Ulasan'}
-                  </button>
+                  <div className="self-end flex items-center gap-space-sm">
+                    {modeEditReview && (
+                      <button
+                        type="button"
+                        onClick={batalEditReview}
+                        disabled={mengirimReview}
+                        className="px-5 py-2.5 rounded-xl text-label-md font-medium text-on-surface hover:bg-surface-container"
+                      >
+                        Batal
+                      </button>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={!komentarBaru.trim() || mengirimReview}
+                      className="bg-secondary hover:bg-secondary-container disabled:opacity-50 disabled:cursor-not-allowed text-on-secondary px-5 py-2.5 rounded-xl text-label-md font-medium transition-colors"
+                    >
+                      {mengirimReview ? 'Mengirim...' : reviewSaya ? 'Simpan Perubahan' : 'Kirim Ulasan'}
+                    </button>
+                  </div>
                 </form>
               ) : (
                 <div className="bg-surface-container-low rounded-2xl p-space-lg flex items-center justify-between gap-space-md mb-space-lg flex-wrap">
@@ -321,7 +409,12 @@ export function DetailTempat() {
                           <div className="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-on-secondary-fixed">
                             {review.inisial}
                           </div>
-                          <h4 className="text-label-lg font-bold text-on-surface">{review.namaUser}</h4>
+                          <h4 className="text-label-lg font-bold text-on-surface">
+                            {review.namaUser}
+                            {review.id === reviewSaya?.id && (
+                              <span className="text-on-surface-variant font-normal"> (kamu)</span>
+                            )}
+                          </h4>
                         </div>
                         <div className="flex items-center gap-1 text-amber-500">
                           {Array.from({ length: review.rating }).map((_, index) => (
