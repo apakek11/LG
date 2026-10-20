@@ -45,13 +45,16 @@ grant execute on function public.admin_list_users() to authenticated;
 
 -- Pengguna biasa boleh mengubah profilnya sendiri (policy profiles_update_self),
 -- tapi tidak boleh menaikkan role-nya sendiri jadi admin.
+-- auth.uid() NULL berarti perubahan datang dari SQL Editor / service role
+-- (bukan dari aplikasi), jadi dibiarkan — itu cara menunjuk admin pertama.
+-- Pengunjung anonim tetap tidak bisa sampai sini karena ditolak RLS.
 create or replace function public.cegah_ubah_role_sendiri()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
 begin
-  if new.role is distinct from old.role and not public.is_admin() then
+  if new.role is distinct from old.role and auth.uid() is not null and not public.is_admin() then
     raise exception 'Role hanya bisa diubah oleh admin.' using errcode = '42501';
   end if;
   return new;
